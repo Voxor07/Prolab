@@ -1,0 +1,1489 @@
+using System.Windows.Forms;
+
+namespace Giris
+{
+    partial class Form1
+    {
+        /// <summary>
+        ///  Required designer variable.
+        /// </summary>
+        private System.ComponentModel.IContainer components = null;
+
+        /// <summary>
+        ///  Clean up any resources being used.
+        /// </summary>
+        /// <param name="disposing">true if managed resources should be disposed; otherwise, false.</param>
+        protected override void Dispose(bool disposing)
+        {
+            if (disposing && (components != null))
+            {
+                components.Dispose();
+            }
+            base.Dispose(disposing);
+        }
+
+        #region Windows Form Designer generated code
+
+        /// <summary>
+        ///  Required method for Designer support - do not modify
+        ///  the contents of this method with the code editor.
+        /// </summary>
+        private void InitializeComponent()
+        {
+            textBox1 = new TextBox();
+            textBox2 = new TextBox();
+            label1 = new Label();
+            label2 = new Label();
+            button1 = new Button();
+            SuspendLayout();
+            // 
+            // textBox1
+            // 
+            textBox1.Anchor = AnchorStyles.None;
+            textBox1.Location = new Point(366, 228);
+            textBox1.Name = "textBox1";
+            textBox1.Size = new Size(125, 27);
+            textBox1.TabIndex = 0;
+            textBox1.TextChanged += textBox1_TextChanged;
+            // 
+            // textBox2
+            // 
+            textBox2.Anchor = AnchorStyles.None;
+            textBox2.Location = new Point(366, 283);
+            textBox2.Name = "textBox2";
+            textBox2.Size = new Size(125, 27);
+            textBox2.TabIndex = 1;
+            textBox2.TextChanged += textBox2_TextChanged;
+            // 
+            // label1
+            // 
+            label1.Anchor = AnchorStyles.None;
+            label1.AutoSize = true;
+            label1.ForeColor = Color.DarkBlue;
+            label1.Location = new Point(413, 193);
+            label1.Name = "label1";
+            label1.Size = new Size(18, 20);
+            label1.TabIndex = 2;
+            label1.Text = "X";
+            label1.Click += label1_Click;
+            // 
+            // label2
+            // 
+            label2.Anchor = AnchorStyles.None;
+            label2.AutoSize = true;
+            label2.ForeColor = Color.DarkBlue;
+            label2.Location = new Point(413, 260);
+            label2.Name = "label2";
+            label2.Size = new Size(17, 20);
+            label2.TabIndex = 3;
+            label2.Text = "Y";
+            label2.Click += label2_Click;
+            // 
+            // button1
+            // 
+            button1.Anchor = AnchorStyles.None;
+            button1.ForeColor = Color.DarkBlue;
+            button1.Location = new Point(384, 331);
+            button1.Name = "button1";
+            button1.Size = new Size(94, 29);
+            button1.TabIndex = 4;
+            button1.Text = "New Map";
+            button1.UseVisualStyleBackColor = true;
+            button1.Click += button1_Click;
+            // 
+            // Form1
+            // 
+            AutoScaleDimensions = new SizeF(8F, 20F);
+            AutoScaleMode = AutoScaleMode.Font;
+            ClientSize = new Size(855, 505);
+            Controls.Add(button1);
+            Controls.Add(label2);
+            Controls.Add(label1);
+            Controls.Add(textBox2);
+            Controls.Add(textBox1);
+            Name = "Form1";
+            Text = "Form1";
+            Load += Form1_Load;
+            ResumeLayout(false);
+            PerformLayout();
+        }
+
+
+        #endregion
+
+        private TextBox textBox1;
+        private TextBox textBox2;
+        private Label label1;
+        private Label label2;
+        private Button button1;
+    }
+}
+
+/////////////////////////////////////////////////////////////
+namespace Giris
+{
+    public partial class Form1 : Form
+    {
+        int x, y;
+        private int originalWidth;
+        private int originalHeight;
+        public Form1()
+        {
+            InitializeComponent();
+            originalWidth = this.ClientSize.Width;
+            originalHeight = this.ClientSize.Height;
+        }
+
+        public void textBox1_TextChanged(object sender, EventArgs e)
+        {
+            if (int.TryParse(textBox1.Text, out x))
+            {
+                label1.Text = "x koordinatı: " + x.ToString();
+            }
+            else
+            {
+                label1.Text = "Geçersiz giriş x!";
+            }
+        }
+
+        public void textBox2_TextChanged(object sender, EventArgs e)
+        {
+            if (int.TryParse(textBox2.Text, out y))
+            {
+                label2.Text = "y koordinatı: " + y.ToString();
+            }
+            else
+            {
+                label2.Text = "Geçersiz giriş y!";
+            }
+        }
+
+        private void button1_Click(object sender, EventArgs e)
+        {
+            // Button1 tıklandığında yeni bir form oluştur
+            Form2 yeniForm = new Form2(x, y);
+            yeniForm.Show();
+        }
+        private void Form1_Load(object sender, EventArgs e)
+        {
+            // PictureBox'ı oluştur ve arka plana ekle
+            PictureBox pictureBox1 = new PictureBox();
+            pictureBox1.Dock = DockStyle.Fill;
+            pictureBox1.Image = Image.FromFile(@"C:\Users\ogulc\source\repos\Otomata\adsız.png");
+            pictureBox1.SizeMode = PictureBoxSizeMode.StretchImage;
+            this.Controls.Add(pictureBox1);
+        }
+
+
+        private void label1_Click(object sender, EventArgs e)
+        {
+
+        }
+
+        private void label2_Click(object sender, EventArgs e)
+        {
+
+        }
+
+    }
+}
+//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+using Giris;
+using Microsoft.VisualBasic.Devices;
+using System;
+using System.Drawing;
+using System.Runtime.CompilerServices;
+using System.Windows.Forms;
+using System.Windows.Forms.VisualStyles;
+using static Giris.Form2;
+
+namespace Giris
+{
+    public partial class Form2 : Form
+    {
+        private System.Windows.Forms.Timer moveTimer = new System.Windows.Forms.Timer();
+        private int x, y; // Koordinatların saklanacağı değişkenler
+        private int cellSize = 10; // Hücre boyutu
+        public PictureBox pictureBox = new();
+        int mouseX, mouseY; // Fare konumunu saklamak için değişkenler
+        private static List<EngellerKoordinat> engellerKoordinatListesi = new List<EngellerKoordinat>();
+        private List<Arilar> arilarListesi = new List<Arilar>();
+        private List<Kuslar> kuslarListesi = new List<Kuslar>();
+        private List<Karakter> karaktersListesi = new List<Karakter>();
+        List<(int, int, EngellerType)> sandiklar = new List<(int, int, EngellerType)>(); // Yeni bir liste oluştur
+
+        public Form2(int x, int y)
+        {
+            InitializeComponent();
+            this.x = x;
+            this.y = y;
+            DrawCoordinatePlane();
+            DrawRandomObstacles();
+            InitializeMoveTimer();
+            //StartTimer();
+            this.pictureBox.Paint += PictureBox_Paint;
+            this.pictureBox.MouseDown += PictureBox_MouseDown; // PictureBox üzerinde MouseDown olayını dinle
+            this.pictureBox.MouseMove += PictureBox_MouseMove; // PictureBox üzerinde MouseMove olayını dinle
+            this.Controls.Add(pictureBox); // Forma PictureBox'u ekle
+
+        }
+
+        private void button1_Click(object sender, EventArgs e)
+        {
+            AyarlaSisliHarita();
+            StartTimer(); // Timer'ı başlat
+        }
+        
+        private void AyarlaSisliHarita()
+        {
+            // Sisli haritayı ayarla
+            // Örnek olarak karakterin olduğu koordinatları ve görüş alanını hesapla
+            if (karaktersListesi.Count > 0)
+            {
+                Karakter karakter = karaktersListesi.First();
+                int karakterX = karakter.x;
+                int karakterY = karakter.y;
+                int viewSize = karakter.cellSize * 7; // Görüş alanı boyutu hesaplanıyor
+                int sisliHaritaBoyut = viewSize * 2 + karakter.cellSize * karakter.boyut;
+
+                // Sis efekti için bir Brush oluştur
+                Brush sisBrush = new SolidBrush(Color.FromArgb(128, Color.Gray)); // Yarı saydam gri
+
+                // Sis efekti alanını PictureBox üzerine çiz
+                using (Graphics g = Graphics.FromImage(pictureBox.Image))
+                {
+                    // Sis efekti alanını belirtmek için dikdörtgen çiz
+                    g.FillRectangle(sisBrush, 0, 0, pictureBox.Width, pictureBox.Height);
+
+                   // karakter.Draw(g); // Karakteri yeniden çiz
+                }
+
+                pictureBox.Invalidate(); // PictureBox'ı yeniden çiz
+
+            }
+        }
+        private void InitializeMoveTimer()
+        {
+            // Timer aralığını bir sabit üzerinden ayarlamak daha anlaşılır olabilir
+            int timerInterval = 1000; // ms cinsinden
+            moveTimer.Interval = timerInterval;
+            // Timer'ın tetikleyici olayını doğrudan bir metoda atayabilirsiniz
+            moveTimer.Tick += OnMoveTimerTick;
+        }
+        private void OnMoveTimerTick(object? sender, EventArgs e)
+        {
+            MoveCharacters();
+            // İlk çizim yapıldıysa PictureBox'ı yeniden çiz
+            pictureBox.Invalidate();
+
+        }
+        private void PictureBox_Paint(object? sender, PaintEventArgs e)
+        {
+            DrawCharacters(e.Graphics); // Karakterleri ve engelleri çizdir
+                                        // Karakter varsa ve karakter listesinde sadece bir karakter varsa (tek karakter varsa)
+            if (karaktersListesi.Count == 1)
+            {
+                Karakter karakter = karaktersListesi.First();
+                DrawViewArea(e.Graphics, karakter.x, karakter.y); // Görüş alanını çiz
+            }
+        }
+        private void DrawViewArea(Graphics g, int karakterX, int karakterY)
+        {
+            bool s = true;
+            if (s)
+            {
+                int viewSize = cellSize * 7; // Görüş alanı boyutu hesaplanıyor
+                int sisliHaritaBoyut = viewSize * 2 + cellSize;
+                Brush sisBrush = new SolidBrush(Color.FromArgb(128, Color.Gray));
+                Brush brush = new SolidBrush(Color.FromArgb(128, Color.Red)); // Yarı saydam kırmızı fırça oluştur
+                g.FillRectangle(sisBrush, karakterX - viewSize, karakterY - viewSize, sisliHaritaBoyut, sisliHaritaBoyut); // Sis efekti alanını belirt
+
+                s = false;
+            }
+            else
+            {
+                int viewSize = cellSize * 7; // Görüş alanı boyutu hesaplanıyor
+                int sisliHaritaBoyut = viewSize * 2 + cellSize;
+                Brush sisBrush = new SolidBrush(Color.FromArgb(128, Color.Gray));
+                Brush brush = new SolidBrush(Color.FromArgb(128, Color.White)); // Yarı saydam kırmızı fırça oluştur
+                g.FillRectangle(sisBrush, karakterX - viewSize, karakterY - viewSize, sisliHaritaBoyut, sisliHaritaBoyut); // Sis efekti alanını belirt
+
+            }
+        }
+
+        private void MoveCharacters()
+        {
+            foreach (var arilar in arilarListesi)
+            {
+                arilar.Move(); // Her arının hareketini gerçekleştir
+            }
+
+            foreach (var kuslar in kuslarListesi)
+            {
+                kuslar.Move(); // Her kuşun hareketini gerçekleştir
+            }
+            Karakter karakter = karaktersListesi.First();
+            karakter.HareketEt(new Random());
+
+        }
+        private bool isFirstDraw = true; // İlk çizim bayrağı
+        private void DrawCharacters(Graphics g)
+        {
+            foreach (var arilar in arilarListesi)
+            {
+                arilar.Draw(g); // Her arıyı yeniden çiz
+            }
+
+            foreach (var kuslar in kuslarListesi)
+            {
+                kuslar.Draw(g); // Her kuşu yeniden çiz
+            }
+            // İlk çizim yapıldıysa bayrağı false yap
+            if (isFirstDraw)
+            {
+                isFirstDraw = false;
+            }
+            Karakter karakter = karaktersListesi.First();
+            karakter.HareketEt(new Random());
+            karakter.Topla(sandiklar); // Sandıkları topla
+            DrawViewArea(g,karakter.x,karakter.y);
+            karakter.Draw(g);
+        }
+        private void PictureBox_MouseMove(object? sender, MouseEventArgs e)
+        {
+            if (e.Button == MouseButtons.Left)
+            {
+                // Fare sol tuşu basılıyken PictureBox'ı hareket ettir
+                pictureBox.Left += e.X - mouseX;
+                pictureBox.Top += e.Y - mouseY;
+            }
+        }
+        private void PictureBox_MouseDown(object? sender, MouseEventArgs e)
+        {
+            if (e.Button == MouseButtons.Left)
+            {
+                // Fare sol tuşuna basıldığında, fare konumunu kaydet
+                mouseX = e.X;
+                mouseY = e.Y;
+            }
+        }
+        private void StartTimer()
+        {
+            moveTimer.Start();
+        }
+        private void StopTimer()
+        {
+            moveTimer.Stop();
+        }
+        private void Form2_Load(object sender, EventArgs e)
+        {
+            //StartTimer();
+        }
+        private void DrawCoordinatePlane()
+        {
+            int width = x * cellSize; // Genişlik
+            int height = y * cellSize; // Yükseklik
+
+            Bitmap bitmap = new Bitmap(width, height); // Yeni bir bitmap oluştur
+
+            using (Graphics g = Graphics.FromImage(bitmap))
+            {
+                g.Clear(Color.White); // Arkaplanı temizle
+
+                Pen gridPen = new Pen(Color.LightGray); // Izgara kalemi oluşturun
+
+                // Dikey çizgileri çizin
+                for (int i = 0; i <= x; i++)
+                {
+                    g.DrawRectangle(gridPen, i * cellSize, 0, cellSize, height);
+                }
+
+                // Yatay çizgileri çizin
+                for (int j = 0; j <= y; j++)
+                {
+                    g.DrawRectangle(gridPen, 0, j * cellSize, width, cellSize);
+                }
+            }
+
+            // PictureBox'a bitmap'i ekle
+            pictureBox.Image = bitmap;
+            pictureBox.Size = new Size(width, height);
+
+            // PictureBox'ı formun içine ekleyin
+            this.Controls.Add(pictureBox);
+
+        }
+        private void DrawRandomObstacles()
+        {
+            // PictureBox'ın içindeki Image'a Graphics nesnesi oluştur
+            using (Graphics g = Graphics.FromImage(pictureBox.Image))
+            {
+                Agackış[] agacKisListesi = Agackış.GenerateRandomAgackış(x, y, cellSize, engellerKoordinatListesi);
+                foreach (var agack in agacKisListesi)
+                {
+                    agack.Draw(g);
+                }
+
+                AgacYaz[] agaclarListesi = AgacYaz.GenerateRandomAgacYaz(x, y, cellSize, engellerKoordinatListesi);
+                foreach (var agacy in agaclarListesi)
+                {
+                    agacy.Draw(g);
+                }
+
+                Kayalaryaz[] kayaYazListesi = Kayalaryaz.GenerateRandomKayalaryaz(x, y, cellSize, engellerKoordinatListesi);
+                foreach (var kayay in kayaYazListesi)
+                {
+                    kayay.Draw(g);
+                }
+
+                Kayalarkış[] kayaKisListesi = Kayalarkış.GenerateRandomKayalarkış(x, y, cellSize, engellerKoordinatListesi);
+                foreach (var kayak in kayaKisListesi)
+                {
+                    kayak.Draw(g);
+                }
+
+                Duvarlar[] duvarListesi = Duvarlar.GenerateRandomDuvarlar(x, y, cellSize, engellerKoordinatListesi);
+                foreach (var duvar in duvarListesi)
+                {
+                    duvar.Draw(g);
+                }
+
+                Daglarkış[] daglarKisListesi = Daglarkış.GenerateRandomDaglarkış(x, y, cellSize, engellerKoordinatListesi);
+                foreach (var dagy in daglarKisListesi)
+                {
+                    dagy.Draw(g);
+                }
+
+                Daglaryaz[] daglarYazListesi = Daglaryaz.GenerateRandomDaglaryaz(x, y, cellSize, engellerKoordinatListesi);
+                foreach (var dag in daglarYazListesi)
+                {
+                    dag.Draw(g);
+                }
+                // Arıları çiz
+                arilarListesi.AddRange(Arilar.GenerateRandomArilar(x, y, cellSize, engellerKoordinatListesi));
+                foreach (var ari in arilarListesi)
+                {
+                    ari.Drawari(g);
+                }
+
+                // Kuşları çiz
+                kuslarListesi.AddRange(Kuslar.GenerateRandomKuslar(x, y, cellSize, engellerKoordinatListesi));
+                foreach (var kus in kuslarListesi)
+                {
+                    kus.Drawkuş(g);
+                }
+
+                var (chestCoordinates, chestDetails) = ChestGenerator.GenerateRandomChests(x, y, cellSize, engellerKoordinatListesi);
+                foreach (var (chestX, chestY, chestType) in chestDetails)
+                {
+                    sandiklar.Add((chestX, chestY, chestType)); // chestDetails değerlerini sandiklar listesine ekle
+
+                    switch (chestType)
+                    {
+                        case EngellerType.GChest:
+                            new GoldChest(chestX, chestY, cellSize).Draw(g);
+                            break;
+                        case EngellerType.SChest:
+                            new SilverChest(chestX, chestY, cellSize).Draw(g);
+                            break;
+                        case EngellerType.EChest:
+                            new EmeraldChest(chestX, chestY, cellSize).Draw(g);
+                            break;
+                        case EngellerType.CChest:
+                            new CopperChest(chestX, chestY, cellSize).Draw(g);
+                            break;
+                        default:
+                            break;
+
+                    }
+                }
+                // Karakteri rastgele oluştur
+                Karakter karakter;
+                do
+                {
+                    int randomX = new Random().Next(x * cellSize - 10);
+                    int randomY = new Random().Next(y * cellSize - 10);
+                    karakter = new Karakter(randomX, randomY, cellSize);
+                } while (engellerKoordinatListesi.Any(e => e.X == karakter.x && e.Y == karakter.y));  // Engellerle çakışma kontrolü
+                karaktersListesi.Add(karakter);
+                karakter.Draw(g);  // Karakteri çiz
+                pictureBox.Invalidate();  // PictureBox'ı yeniden çiz
+            }
+        }
+        public class Engeller
+        {
+            protected int x, y; // Engelin konumu
+            protected int cellSize; // Hücre boyutu
+            public Engeller(int x, int y, int cellSize)
+            {
+                this.x = x;
+                this.y = y;
+                this.cellSize = cellSize;
+            }
+        }
+        public class HareketsizEngel : Engeller
+        {
+            public HareketsizEngel(int x, int y, int cellSize) : base(x, y, cellSize)
+            {
+                // Hareketsiz engel özellikleri burada ayarlanabilir
+            }
+
+        }
+        public abstract class HareketliEngel : Engeller
+        {
+            public List<Point> Yol { get; set; } // Hareketli engellerin takip ettiği yol
+            protected List<Point> spawnKonumu = new List<Point>(); // spawnKonumu değişkenini tanımladık
+
+            public HareketliEngel(int x, int y, int cellSize) : base(x, y, cellSize)
+            {
+                // Yol listesini başlat
+                Yol = new List<Point>();
+            }
+
+            public void Clear(Graphics g)
+            {
+                // Hareketli engelin takip ettiği yolun temizlenmesi
+                foreach (Point nokta in Yol)
+                {
+                    g.FillRectangle(Brushes.Red, nokta.X * cellSize, nokta.Y * cellSize, cellSize, cellSize);
+                }
+                // Yolu temizledikten sonra yol listesini sıfırla
+                Yol.Clear();
+            }
+            public abstract void Draw(Graphics g);
+            public abstract void Move();
+        }
+        public class EngellerKoordinat
+        {
+            public int X { get; set; }
+            public int Y { get; set; }
+            public int Width { get; private set; }
+            public int Height { get; private set; }
+            public EngellerType Type { get; set; }
+            public EngellerKoordinat(int x, int y,EngellerType type)
+            {
+                X = x;
+                Y = y;
+                Type = type;
+                // Engellerin boyutlarını belirle
+                if (type == EngellerType.AgacKis)
+                {
+                    Width = 41;
+                    Height = 40;
+                }
+                else if (type == EngellerType.AgacYaz)
+                {
+                    Width = 40;
+                    Height = 40;
+                }
+                else if (type == EngellerType.Kayalaryaz)
+                {
+                    Width = 40; // Özelleştirilmiş değerler
+                    Height = 40; // Özelleştirilmiş değerler
+                }
+                else if (type == EngellerType.Kayalarkiş)
+                {
+                    Width = 40; // Özelleştirilmiş değerler
+                    Height = 40; // Özelleştirilmiş değerler
+                }
+                else if(type == EngellerType.Duvar)
+                {
+                    Width = 100;
+                    Height = 10;
+                }
+                else if(type==EngellerType.Daglarkiş)
+                {
+                    Width = 150;
+                    Height= 150;
+                }
+                else if(type==EngellerType.Daglaryaz)
+                {
+                    Width = 150;
+                    Height = 150;
+                }
+                else if(type==EngellerType.Arilar)
+                {
+                    Width = 20;
+                    Height = 60;
+                }
+                else if(type==EngellerType.Kuslar)
+                {
+                    Width = 120;
+                    Height = 20;
+                }
+
+            }
+        }
+        public enum EngellerType
+        {
+            AgacKis,
+            AgacYaz,
+            Kayalaryaz,
+            Kayalarkiş,
+            Duvar,
+            Daglarkiş,
+            Daglaryaz,
+            Arilar,
+            Kuslar,
+            GChest,
+            SChest,
+            EChest,
+            CChest,
+            Karakter
+        }
+        public class AgacYaz : HareketsizEngel
+        {
+            private int boyut; // Ağacın boyutu (hücre sayısı cinsinden)
+
+            public AgacYaz(int x, int y, int cellSize) : base(x, y, cellSize)
+            {
+                // Rastgele bir boyut seç
+                Random random = new Random();
+                this.boyut = random.Next(2, 6); // 2 ile 5 arasında (5 dahil değil) bir rastgele sayı seçilir
+            }
+
+            public void Draw(Graphics g)
+            {
+                // Ağacı çizmek için gerekli işlemler
+                int boyutPiksel = boyut * cellSize; // Ağacın piksel cinsinden boyutu
+                g.DrawImage(Image.FromFile("C:/Users/ogulc/source/repos/Otomata/agacy.png"), x - (boyutPiksel / 2), y - (boyutPiksel / 2), boyutPiksel, boyutPiksel);
+            }
+
+            public static AgacYaz[] GenerateRandomAgacYaz(int x, int y, int cellSize, List<EngellerKoordinat> engellerKoordinatListesi)
+            {
+                Random random = new Random();
+                int count = random.Next(3, 5);
+                AgacYaz[] agaclar = new AgacYaz[count];
+
+                for (int i = 0; i < count; i++)
+                {
+                    EngellerKoordinat yeniEngelKoordinat;
+                    bool isOverlap;
+
+                    do
+                    {
+                        int randomX = random.Next(x * cellSize - 50); // Koordinat düzlemi içinde rastgele X koordinatı
+                        int randomY = random.Next(y * cellSize - 50); // Koordinat düzlemi içinde rastgele Y koordinatı
+                        yeniEngelKoordinat = new EngellerKoordinat(randomX, randomY,EngellerType.AgacYaz);
+
+                        // Eğer x koordinatı haritanın solunda ise yeni engel oluşturulmaz
+                        if (randomX < x * cellSize / 2)
+                        {
+                            isOverlap = true;
+                        }
+                        else
+                        {
+                            isOverlap = engellerKoordinatListesi.Any(engel => Math.Abs(engel.X - yeniEngelKoordinat.X) < 15 * cellSize && Math.Abs(engel.Y - yeniEngelKoordinat.Y) < 15 * cellSize);
+                        }
+                    } while (isOverlap);
+
+
+                    // Engeller listesine yeni engel koordinatını ekle
+                    engellerKoordinatListesi.Add(yeniEngelKoordinat);
+                    agaclar[i] = new AgacYaz(yeniEngelKoordinat.X, yeniEngelKoordinat.Y, cellSize);
+
+                }
+
+                return agaclar;
+            }
+
+        }
+        public class Agackış : HareketsizEngel
+        {
+            private int boyut;
+
+            public Agackış(int x, int y, int cellSize) : base(x, y, cellSize)
+            {
+                // Rastgele bir boyut seç
+                Random random = new Random();
+                this.boyut = random.Next(2, 6); // 2 ile 5 arasında (5 dahil değil) bir rastgele sayı seçilir
+            }
+
+            public void Draw(Graphics g)
+            {
+                // Ağacı çizmek için gerekli işlemler
+                int boyutPiksel = boyut * cellSize; // Ağacın piksel cinsinden boyutu
+                g.DrawImage(Image.FromFile("C:/Users/ogulc/source/repos/Otomata/agack.png"), x - (boyutPiksel / 2), y - (boyutPiksel / 2), boyutPiksel, boyutPiksel);
+            }
+
+            public static Agackış[] GenerateRandomAgackış(int x, int y, int cellSize, List<EngellerKoordinat> engellerKoordinatListesi)
+            {
+                Random random = new Random();
+                int count = random.Next(3, 5);
+                Agackış[] agackışlar = new Agackış[count];
+
+                for (int i = 0; i < count; i++)
+                {
+                    EngellerKoordinat yeniEngelKoordinat;
+                    bool isOverlap;
+
+                    do
+                    {
+                        int randomX = random.Next(x * cellSize - 50); // Koordinat düzlemi içinde rastgele X koordinatı
+                        int randomY = random.Next(y * cellSize - 50); // Koordinat düzlemi içinde rastgele Y koordinatı
+                        yeniEngelKoordinat = new EngellerKoordinat(randomX, randomY, EngellerType.AgacKis);
+
+                        // Eğer x koordinatı haritanın solunda ise yeni engel oluşturulmaz
+                        if (randomX > x * cellSize / 2)
+                        {
+                            isOverlap = true;
+                        }
+                        else
+                        {
+                            isOverlap = engellerKoordinatListesi.Any(engel => Math.Abs(engel.X - yeniEngelKoordinat.X) < 15 * cellSize && Math.Abs(engel.Y - yeniEngelKoordinat.Y) < 15 * cellSize);
+                        }
+                    } while (isOverlap);
+
+                    // Engeller listesine yeni engel koordinatını ekle
+                    engellerKoordinatListesi.Add(yeniEngelKoordinat);
+                    agackışlar[i] = new Agackış(yeniEngelKoordinat.X, yeniEngelKoordinat.Y, cellSize);
+                }
+
+                return agackışlar;
+            }
+
+        }
+        public class Kayalaryaz : HareketsizEngel
+        {
+            private int boyut;
+
+            public Kayalaryaz(int x, int y, int cellSize) : base(x, y, cellSize)
+            {
+                // Rastgele bir boyut seç
+                Random random = new Random();
+                this.boyut = random.Next(2, 4);
+            }
+
+            public void Draw(Graphics g)
+            {
+                int boyutPiksel = boyut * cellSize;
+                g.DrawImage(Image.FromFile("C:/Users/ogulc/source/repos/Otomata/kayay.jpeg"), x - (boyutPiksel / 2), y - (boyutPiksel / 2), boyutPiksel, boyutPiksel);
+            }
+
+            public static Kayalaryaz[] GenerateRandomKayalaryaz(int x, int y, int cellSize, List<EngellerKoordinat> engellerKoordinatListesi)
+            {
+                Random random = new Random();
+                int count = random.Next(3, 5);
+                Kayalaryaz[] kayalar = new Kayalaryaz[count];
+
+                for (int i = 0; i < count; i++)
+                {
+                    EngellerKoordinat yeniEngelKoordinat;
+                    bool isOverlap;
+
+                    do
+                    {
+                        int randomX = random.Next(x * cellSize - 50); // Koordinat düzlemi içinde rastgele X koordinatı
+                        int randomY = random.Next(y * cellSize - 50); // Koordinat düzlemi içinde rastgele Y koordinatı
+                        yeniEngelKoordinat = new EngellerKoordinat(randomX, randomY,EngellerType.Kayalaryaz);
+
+                        // Eğer x koordinatı haritanın solunda ise yeni engel oluşturulmaz
+                        if (randomX < x * cellSize / 2)
+                        {
+                            isOverlap = true;
+                        }
+                        else
+                        {
+                            isOverlap = engellerKoordinatListesi.Any(engel => Math.Abs(engel.X - yeniEngelKoordinat.X) < 15 * cellSize && Math.Abs(engel.Y - yeniEngelKoordinat.Y) < 15 * cellSize);
+                        }
+                    } while (isOverlap);
+
+
+                    // Engeller listesine yeni engel koordinatını ekle
+                    engellerKoordinatListesi.Add(yeniEngelKoordinat);
+
+                    // Yeni engeli Kayalaryaz dizisine ekle
+                    kayalar[i] = new Kayalaryaz(yeniEngelKoordinat.X, yeniEngelKoordinat.Y, cellSize);
+                }
+
+                return kayalar;
+            }
+
+        }
+        public class Kayalarkış : HareketsizEngel
+        {
+            private int boyut;
+
+            public Kayalarkış(int x, int y, int cellSize) : base(x, y, cellSize)
+            {
+                // Rastgele bir boyut seç
+                Random random = new Random();
+                this.boyut = random.Next(2, 4);
+            }
+
+            public void Draw(Graphics g)
+            {
+                int boyutPiksel = boyut * cellSize;
+                g.DrawImage(Image.FromFile("C:/Users/ogulc/source/repos/Otomata/kayak.jpeg"), x - (boyutPiksel / 2), y - (boyutPiksel / 2), boyutPiksel, boyutPiksel);
+            }
+            public static Kayalarkış[] GenerateRandomKayalarkış(int x, int y, int cellSize, List<EngellerKoordinat> engellerKoordinatListesi)
+            {
+                Random random = new Random();
+                int count = random.Next(3, 5);
+                Kayalarkış[] kayalark = new Kayalarkış[count];
+
+                for (int i = 0; i < count; i++)
+                {
+                    EngellerKoordinat yeniEngelKoordinat;
+                    bool isOverlap;
+
+                    do
+                    {
+                        int randomX = random.Next(x * cellSize - 50); // Koordinat düzlemi içinde rastgele X koordinatı
+                        int randomY = random.Next(y * cellSize - 50); // Koordinat düzlemi içinde rastgele Y koordinatı
+                        yeniEngelKoordinat = new EngellerKoordinat(randomX, randomY,EngellerType.Kayalarkiş);
+
+                        // Eğer x koordinatı haritanın solunda ise yeni engel oluşturulmaz
+                        if (randomX > x * cellSize / 2)
+                        {
+                            isOverlap = true;
+                        }
+                        else
+                        {
+                            isOverlap = engellerKoordinatListesi.Any(engel => Math.Abs(engel.X - yeniEngelKoordinat.X) < 15 * cellSize && Math.Abs(engel.Y - yeniEngelKoordinat.Y) < 15 * cellSize);
+                        }
+                    } while (isOverlap);
+
+
+                    // Engeller listesine yeni engel koordinatını ekle
+                    engellerKoordinatListesi.Add(yeniEngelKoordinat);
+
+                    // Yeni engeli Kayalarkış dizisine ekle
+                    kayalark[i] = new Kayalarkış(yeniEngelKoordinat.X, yeniEngelKoordinat.Y, cellSize);
+                }
+
+                return kayalark;
+            }
+
+        }
+        public class Duvarlar : HareketsizEngel
+        {
+            public Image Image { get; } = Image.FromFile("C:/Users/ogulc/source/repos/Otomata/duvar.jpeg");
+
+            public Duvarlar(int x, int y, int cellSize) : base(x, y, cellSize)
+            {
+                // Duvar özellikleri burada ayarlanabilir
+            }
+            public void Draw(Graphics g)
+            {
+                // Duvarı çizmek için gerekli kodlar
+                g.DrawImage(Image, x, y, cellSize * 10, cellSize); // 10x1'lik boyutta duvar çizimi
+            }
+
+            public static Duvarlar[] GenerateRandomDuvarlar(int x, int y, int cellSize, List<EngellerKoordinat> engellerKoordinatListesi)
+            {
+                Random random = new Random();
+                int count = random.Next(3, 5);
+                Duvarlar[] duvarlar = new Duvarlar[count];
+
+                for (int i = 0; i < count; i++)
+                {
+                    EngellerKoordinat yeniEngelKoordinat;
+                    bool isOverlap;
+
+                    do
+                    {
+                        int randomX = random.Next(x * cellSize - 50); // Koordinat düzlemi içinde rastgele X koordinatı
+                        int randomY = random.Next(y * cellSize - 50); // Koordinat düzlemi içinde rastgele Y koordinatı
+                        yeniEngelKoordinat = new EngellerKoordinat(randomX, randomY,EngellerType.Duvar);
+
+                        isOverlap = engellerKoordinatListesi.Any(engel => Math.Abs(engel.X - yeniEngelKoordinat.X) < 15 * cellSize && Math.Abs(engel.Y - yeniEngelKoordinat.Y) < 15 * cellSize);
+                    } while (isOverlap);
+
+                    // Engeller listesine yeni engel koordinatını ekle
+                    engellerKoordinatListesi.Add(yeniEngelKoordinat);
+
+                    // Yeni engeli Duvarlar dizisine ekle
+                    duvarlar[i] = new Duvarlar(yeniEngelKoordinat.X, yeniEngelKoordinat.Y, cellSize);
+                }
+
+                return duvarlar;
+            }
+
+        }
+        public class Daglaryaz : HareketsizEngel
+        {
+            private int boyut;
+            public Daglaryaz(int x, int y, int cellSize) : base(x, y, cellSize)
+            {
+                // Rastgele bir boyut seç
+                Random random = new Random();
+                this.boyut = 15;
+            }
+
+            public void Draw(Graphics g)
+            {
+                int boyutPiksel = boyut * cellSize;
+                g.DrawImage(Image.FromFile("C:/Users/ogulc/source/repos/Otomata/dagy.png"), x - (boyutPiksel / 2), y - (boyutPiksel / 2), boyutPiksel, boyutPiksel);
+            }
+
+            public static Daglaryaz[] GenerateRandomDaglaryaz(int x, int y, int cellSize, List<EngellerKoordinat> engellerKoordinatListesi)
+            {
+                Random random = new Random();
+                int count = random.Next(3, 5);
+                Daglaryaz[] daglar = new Daglaryaz[count];
+
+                for (int i = 0; i < count; i++)
+                {
+                    EngellerKoordinat yeniEngelKoordinat;
+                    bool isOverlap;
+
+                    do
+                    {
+                        int randomX = random.Next(x * cellSize - 150); // Koordinat düzlemi içinde rastgele X koordinatı
+                        int randomY = random.Next(y * cellSize - 150); // Koordinat düzlemi içinde rastgele Y koordinatı
+                        yeniEngelKoordinat = new EngellerKoordinat(randomX, randomY,EngellerType.Daglaryaz);
+
+                        // Eğer x koordinatı haritanın solunda ise yeni engel oluşturulmaz
+                        if (randomX < x * cellSize / 2)
+                        {
+                            isOverlap = true;
+                        }
+                        else
+                        {
+                            isOverlap = engellerKoordinatListesi.Any(engel => Math.Abs(engel.X - yeniEngelKoordinat.X) < 20 * cellSize && Math.Abs(engel.Y - yeniEngelKoordinat.Y) < 20 * cellSize);
+                        }
+                    } while (isOverlap);
+
+
+                    // Engeller listesine yeni engel koordinatını ekle
+                    engellerKoordinatListesi.Add(yeniEngelKoordinat);
+
+                    // Yeni engeli Daglaryaz dizisine ekle
+                    daglar[i] = new Daglaryaz(yeniEngelKoordinat.X, yeniEngelKoordinat.Y, cellSize);
+                }
+
+                return daglar;
+            }
+
+        }
+        public class Daglarkış : HareketsizEngel
+        {
+            private int boyut;
+
+            public Daglarkış(int x, int y, int cellSize) : base(x, y, cellSize)
+            {
+                // Rastgele bir boyut seç
+                Random random = new Random();
+                this.boyut = 15;
+            }
+
+            public void Draw(Graphics g)
+            {
+                int boyutPiksel = boyut * cellSize;
+                g.DrawImage(Image.FromFile("C:/Users/ogulc/source/repos/Otomata/dagk.jpeg"), x - (boyutPiksel / 2), y - (boyutPiksel / 2), boyutPiksel, boyutPiksel);
+            }
+
+            public static Daglarkış[] GenerateRandomDaglarkış(int x, int y, int cellSize, List<EngellerKoordinat> engellerKoordinatListesi)
+            {
+                Random random = new Random();
+                int count = random.Next(3, 5);
+                Daglarkış[] daglark = new Daglarkış[count];
+
+                for (int i = 0; i < count; i++)
+                {
+                    EngellerKoordinat yeniEngelKoordinat;
+                    bool isOverlap;
+
+                    do
+                    {
+                        int randomX = random.Next(x * cellSize - 150); // Koordinat düzlemi içinde rastgele X koordinatı
+                        int randomY = random.Next(y * cellSize - 150); // Koordinat düzlemi içinde rastgele Y koordinatı
+                        yeniEngelKoordinat = new EngellerKoordinat(randomX, randomY,EngellerType.Daglarkiş);
+
+                        // Eğer x koordinatı haritanın solunda ise yeni engel oluşturulmaz
+                        if (randomX > x * cellSize / 2)
+                        {
+                            isOverlap = true;
+                        }
+                        else
+                        {
+                            isOverlap = engellerKoordinatListesi.Any(engel => Math.Abs(engel.X - yeniEngelKoordinat.X) < 15 * cellSize && Math.Abs(engel.Y - yeniEngelKoordinat.Y) < 15 * cellSize);
+                        }
+                    } while (isOverlap);
+
+
+                    // Engeller listesine yeni engel koordinatını ekle
+                    engellerKoordinatListesi.Add(yeniEngelKoordinat);
+
+                    // Yeni engeli Daglarkış dizisine ekle
+                    daglark[i] = new Daglarkış(yeniEngelKoordinat.X, yeniEngelKoordinat.Y, cellSize);
+                }
+
+                return daglark;
+            }
+
+        }
+        public class Kuslar : HareketliEngel
+        {
+            private int boyut;
+            private int sagHareketMesafe = 5;
+            private int solHareketMesafe = 5;
+            private bool sagaHareket = true;
+
+            public Kuslar(int x, int y, int cellSize) : base(x, y, cellSize)
+            {
+                this.boyut = 2;
+                spawnKonumu.Add(new Point(x, y)); // spawnKonumu'nu başlat
+            }
+
+            // Kırmızı alanı çizen ve kuşu çizen fonksiyonlar
+            public void DrawRedArea(Graphics g)
+            {
+                // x ve y değerlerine göre 5 birim sağına ve 5 birim soluna kadar 2x2 boyutluk alanı kırmızıya boyayın
+                int baslangicX = x - cellSize;
+                int baslangicY = y - cellSize;
+                int boyutX = cellSize * 2;
+                int boyutY = cellSize * 2;
+
+                // Başlangıç noktasından sağ ve sol kenarlara doğru 5 birimlik alanları kırmızıya boyayın
+                for (int i = 0; i <= 6; i++)
+                    g.FillRectangle(Brushes.Red, baslangicX + i * cellSize, baslangicY, cellSize, boyutY); // Sağ kenar
+                for (int j = 0; j <= 5; j++)
+                    g.FillRectangle(Brushes.Red, baslangicX - j * cellSize, baslangicY, cellSize, boyutY); // Sol kenar
+
+                // Resimlerin güzergahını çizmek için aşağıdaki kodu kullanabilirsiniz
+                for (int i = 1; i < Yol.Count; i++)
+                {
+                    g.DrawLine(Pens.Red, Yol[i - 1].X * cellSize, Yol[i - 1].Y * cellSize, Yol[i].X * cellSize, Yol[i].Y * cellSize);
+                }
+            }
+
+            public override void Draw(Graphics g)
+            {
+                int boyutPiksel = boyut * cellSize;
+                g.DrawImage(Image.FromFile("C:/Users/ogulc/source/repos/Otomata/kus.jpeg"), x - (boyutPiksel / 2), y - (boyutPiksel / 2), boyutPiksel, boyutPiksel);
+            }
+
+            public void Drawkuş(Graphics g)
+            {
+                Draw(g); // Kuşu çiz
+                DrawRedArea(g); // Kırmızı alanı çiz
+            }
+
+            public static Kuslar[] GenerateRandomKuslar(int x, int y, int cellSize, List<EngellerKoordinat> engellerKoordinatListesi)
+            {
+                Random random = new Random();
+                int count = 2;
+                Kuslar[] kuslar = new Kuslar[count];
+
+                for (int i = 0; i < count; i++)
+                {
+                    EngellerKoordinat yeniEngelKoordinat;
+                    bool isOverlap;
+
+                    do
+                    {
+                        int randomX = random.Next(x * cellSize - 50); // Koordinat düzlemi içinde rastgele X koordinatı
+                        int randomY = random.Next(y * cellSize - 50); // Koordinat düzlemi içinde rastgele Y koordinatı
+                        yeniEngelKoordinat = new EngellerKoordinat(randomX, randomY,EngellerType.Kuslar);
+
+                        isOverlap = engellerKoordinatListesi.Any(engel => Math.Abs(engel.X - yeniEngelKoordinat.X) < 15 * cellSize && Math.Abs(engel.Y - yeniEngelKoordinat.Y) < 15 * cellSize);
+                    } while (isOverlap);
+
+                    // Engeller listesine yeni engel koordinatını ekle
+                    engellerKoordinatListesi.Add(yeniEngelKoordinat);
+                    kuslar[i] = new Kuslar(yeniEngelKoordinat.X, yeniEngelKoordinat.Y, cellSize);
+                }
+
+                return kuslar;
+            }
+            public override void Move()
+            {
+                int hareketHizi = 10;
+
+                if (sagaHareket)
+                {
+                    if (x + hareketHizi <= spawnKonumu[0].X + sagHareketMesafe * cellSize) // Spawn noktasından sağa hareket
+                    {
+                        x += hareketHizi;
+                    }
+                    else
+                    {
+                        sagaHareket = false; // Sağa sınırına ulaşıldı, geri hareket başlat
+                    }
+                }
+                else
+                {
+                    if (x - hareketHizi >= spawnKonumu[0].X - solHareketMesafe * cellSize) // Spawn noktasına geri hareket
+                    {
+                        x -= hareketHizi;
+                    }
+                    else
+                    {
+                        sagaHareket = true; // Spawn noktasına ulaşıldı, ileri hareket başlat
+                    }
+                }
+                // Yolu güncelle, yeni konumu ekle
+                Yol.Add(new Point(x, y));
+            }
+        }
+        public class Arilar : HareketliEngel
+        {
+            private int boyut;
+            private int yukHareketMesafe = 3;
+            private int asHareketMesafe = 3;
+            private bool sagaHareket = true;
+
+
+            public Arilar(int x, int y, int cellSize) : base(x, y, cellSize)
+            {
+                this.boyut = 2;
+                spawnKonumu.Add(new Point(x, y)); // spawnKonumu'nu başlat
+
+            }
+
+            public override void Draw(Graphics g)
+            {
+                int boyutPiksel = boyut * cellSize;
+                g.DrawImage(Image.FromFile("C:/Users/ogulc/source/repos/Otomata/ari.jpeg"), x - (boyutPiksel / 2), y - (boyutPiksel / 2), boyutPiksel, boyutPiksel);
+            }
+            public void DrawRedArea(Graphics g)
+            {
+                // x ve y değerlerine göre 3 birim yukarısına ve 3 birim aşağısına kadar 2x2 boyutluk alanı kırmızıya boyayın
+                int baslangicX = x - cellSize;
+                int baslangicY = y - cellSize;
+                int boyutX = cellSize * 2;
+                int boyutY = cellSize * 2;
+
+                // Başlangıç noktasından yukarı ve aşağı doğru 3 birimlik alanları kırmızıya boyayın
+                for (int i = 0; i <= 3; i++)
+                    g.FillRectangle(Brushes.Red, baslangicX, baslangicY - i * cellSize, boyutX, cellSize); // Yukarı kenar
+                for (int j = 0; j <= 4; j++)
+                    g.FillRectangle(Brushes.Red, baslangicX, baslangicY + j * cellSize, boyutX, cellSize); // Aşağı kenar
+
+                // Resimlerin güzergahını çizmek için aşağıdaki kodu kullanabilirsiniz
+                for (int i = 1; i < Yol.Count; i++)
+                {
+                    g.DrawLine(Pens.Red, Yol[i - 1].X * cellSize, Yol[i - 1].Y * cellSize, Yol[i].X * cellSize, Yol[i].Y * cellSize);
+                }
+            }
+            public void Drawari(Graphics g)
+            {
+                Draw(g); // Arıyı çiz
+                DrawRedArea(g); // Kırmızı alanı çiz
+            }
+
+            public static Arilar[] GenerateRandomArilar(int x, int y, int cellSize, List<EngellerKoordinat> engellerKoordinatListesi)
+            {
+                Random random = new Random();
+                int count = 2;
+                Arilar[] arilar = new Arilar[count];
+
+                for (int i = 0; i < count; i++)
+                {
+                    EngellerKoordinat yeniEngelKoordinat;
+                    bool isOverlap;
+
+                    do
+                    {
+                        int randomX = random.Next(x * cellSize - 50); // Koordinat düzlemi içinde rastgele X koordinatı
+                        int randomY = random.Next(y * cellSize - 50); // Koordinat düzlemi içinde rastgele Y koordinatı
+                        yeniEngelKoordinat = new EngellerKoordinat(randomX, randomY,EngellerType.Arilar);
+
+                        isOverlap = engellerKoordinatListesi.Any(engel => Math.Abs(engel.X - yeniEngelKoordinat.X) < 15 * cellSize && Math.Abs(engel.Y - yeniEngelKoordinat.Y) < 15 * cellSize);
+                    } while (isOverlap);
+
+                    // Engeller listesine yeni engel koordinatını ekle
+                    engellerKoordinatListesi.Add(yeniEngelKoordinat);
+                    arilar[i] = new Arilar(yeniEngelKoordinat.X, yeniEngelKoordinat.Y, cellSize);
+                }
+
+                return arilar;
+            }
+            public override void Move()
+            {
+                int hareketHizi = 10;
+
+                if (sagaHareket)
+                {
+                    if (y + hareketHizi <= spawnKonumu[0].Y + yukHareketMesafe * cellSize) // Spawn noktasından sağa hareket
+                    {
+                        y += hareketHizi;
+                    }
+                    else
+                    {
+                        sagaHareket = false; // Sağa sınırına ulaşıldı, geri hareket başlat
+                    }
+                }
+                else
+                {
+                    if (y - hareketHizi >= spawnKonumu[0].Y - asHareketMesafe * cellSize) // Spawn noktasına geri hareket
+                    {
+                        y -= hareketHizi;
+                    }
+                    else
+                    {
+                        sagaHareket = true; // Spawn noktasına ulaşıldı, ileri hareket başlat
+                    }
+                }
+            }
+        }
+        public abstract class TreasureChest
+        {
+            protected int x, y, cellSize, boyut = 2;
+            public TreasureChest(int x, int y, int cellSize)
+            {
+                this.x = x;
+                this.y = y;
+                this.cellSize = cellSize;
+            }
+            public abstract void Draw(Graphics g);
+        }
+        public static class ChestGenerator
+        {
+            public static (List<EngellerKoordinat>, List<(int, int, EngellerType)>) GenerateRandomChests(int x, int y, int cellSize, List<EngellerKoordinat> engellerKoordinatListesi)
+            {
+                Random random = new Random();
+                List<EngellerKoordinat> chestCoordinates = new List<EngellerKoordinat>();
+                List<(int, int, EngellerType)> chestDetails = new List<(int, int, EngellerType)>();
+
+                for (EngellerType chestType = EngellerType.GChest; chestType <= EngellerType.CChest; chestType++)
+                {
+                    int count = random.Next(5, 11);
+                    for (int i = 0; i < count; i++)
+                    {
+                        EngellerKoordinat yeniEngelKoordinat;
+                        bool isOverlap;
+
+                        do
+                        {
+                            int randomX = random.Next(x * cellSize - 20);
+                            int randomY = random.Next(y * cellSize - 20);
+                            yeniEngelKoordinat = new EngellerKoordinat(randomX, randomY,chestType);
+
+                            isOverlap = engellerKoordinatListesi.Any(engel => Math.Abs(engel.X - yeniEngelKoordinat.X) < 10 && Math.Abs(engel.Y - yeniEngelKoordinat.Y) < 10);
+                        } while (isOverlap);
+
+                        engellerKoordinatListesi.Add(yeniEngelKoordinat);
+                        chestCoordinates.Add(yeniEngelKoordinat);
+                        chestDetails.Add((yeniEngelKoordinat.X, yeniEngelKoordinat.Y, chestType));
+                    }
+                }
+
+                return (chestCoordinates, chestDetails);
+            }
+        }
+        public class GoldChest : TreasureChest
+        {
+            public GoldChest(int x, int y, int cellSize) : base(x, y, cellSize) { }
+
+            public override void Draw(Graphics g)
+            {
+                int boyutPiksel = cellSize * boyut;
+                Image chestImage = Image.FromFile("C:/Users/ogulc/source/repos/Otomata/golden.jpeg");
+                g.DrawImage(chestImage, x - (boyutPiksel / 2), y - (boyutPiksel / 2), boyutPiksel, boyutPiksel);
+            }
+        }
+        public class SilverChest : TreasureChest
+        {
+            public SilverChest(int x, int y, int cellSize) : base(x, y, cellSize) { }
+
+            public override void Draw(Graphics g)
+            {
+                int boyutPiksel = cellSize * boyut;
+                Image chestImage = Image.FromFile("C:/Users/ogulc/source/repos/Otomata/silver.jpeg");
+                g.DrawImage(chestImage, x - (boyutPiksel / 2), y - (boyutPiksel / 2), boyutPiksel, boyutPiksel);
+            }
+        }
+        public class CopperChest : TreasureChest
+        {
+            public CopperChest(int x, int y, int cellSize) : base(x, y, cellSize) { }
+
+            public override void Draw(Graphics g)
+            {
+                int boyutPiksel = cellSize * boyut;
+                Image chestImage = Image.FromFile("C:/Users/ogulc/source/repos/Otomata/copper.jpeg");
+                g.DrawImage(chestImage, x - (boyutPiksel / 2), y - (boyutPiksel / 2), boyutPiksel, boyutPiksel);
+            }
+        }
+        public class EmeraldChest : TreasureChest
+        {
+            public EmeraldChest(int x, int y, int cellSize) : base(x, y, cellSize) { }
+
+            public override void Draw(Graphics g)
+            {
+                int boyutPiksel = cellSize * boyut;
+                Image chestImage = Image.FromFile("C:/Users/ogulc/source/repos/Otomata/ender.jpeg");
+                g.DrawImage(chestImage, x - (boyutPiksel / 2), y - (boyutPiksel / 2), boyutPiksel, boyutPiksel);
+            }
+        }
+        public class Karakter
+        {
+            public int x, y, cellSize, boyut = 1;
+            public Karakter(int x, int y, int cellSize)
+            {
+                this.x = x;
+                this.y = y;
+                this.cellSize = cellSize;
+            }
+
+            public List<Lokasyon> OgrenilenKareler { get; set; } = new List<Lokasyon>();
+            public List<EngellerKoordinat> Engeller { get; set; } // Engelleri saklamak için
+
+            public void HareketEt(Random random)
+            {
+                int randomYon = random.Next(4); // 0, 1, 2, 3: Yukarı, Aşağı, Sol, Sağ
+
+                switch (randomYon)
+                {
+                    case 0:
+                        if (YukariBos())
+                            y -= cellSize;
+                        break;
+                    case 1:
+                        if (AsagiBos())
+                            y += cellSize;
+                        break;
+                    case 2:
+                        if (SolBos())
+                            x -= cellSize;
+                        break;
+                    case 3:
+                        if (SagBos())
+                            x += cellSize;
+                        break;
+                    default:
+                        break;
+                }
+                OgrenilenKareler.Add(new Lokasyon(x, y)); // Yeni konumu öğrenilen kareler listesine ekle
+            }
+
+            private bool YukariBos()
+            {
+                // Karakterin görüş alanındaki engelleri kontrol et
+                return !engellerKoordinatListesi.Any(e => e.X >= x && e.X < x + cellSize && e.Y >= y - cellSize && e.Y < y && e.Type != EngellerType.Karakter);
+            }
+
+            private bool AsagiBos()
+            {
+                // Karakterin görüş alanındaki engelleri kontrol et
+                return !engellerKoordinatListesi.Any(e => e.X >= x && e.X < x + cellSize && e.Y > y && e.Y <= y + cellSize && e.Type != EngellerType.Karakter);
+            }
+
+            private bool SolBos()
+            {
+                // Karakterin görüş alanındaki engelleri kontrol et
+                return !engellerKoordinatListesi.Any(e => e.X >= x - cellSize && e.X < x && e.Y >= y && e.Y < y + cellSize && e.Type != EngellerType.Karakter);
+            }
+
+            private bool SagBos()
+            {
+                // Karakterin görüş alanındaki engelleri kontrol et
+                return !engellerKoordinatListesi.Any(e => e.X > x && e.X <= x + cellSize && e.Y >= y && e.Y < y + cellSize && e.Type != EngellerType.Karakter);
+            }
+
+            public void Topla(List<(int, int, EngellerType)> sandiklar)
+            {
+                foreach (var (sandikX, sandikY, sandikTipi) in sandiklar)
+                {
+                    if (sandikX == x && sandikY == y)
+                    {
+                        // Sandık ile karakter aynı konumda ise sandığı kaldır
+                        sandiklar.Remove((sandikX, sandikY, sandikTipi));
+                        break; // Birden fazla sandık olabilir, ilk sandığı topladıktan sonra döngüden çık
+                    }
+                }
+            }
+            
+            public void Draw(Graphics g)
+            {
+                // Karakterin çizim işlemleri burada yapılır
+                Brush brush = Brushes.Purple;  // Mor renk kullanılıyor
+                g.FillRectangle(brush, x, y, cellSize * boyut, cellSize * boyut);  // 10x10 boyutunda karakteri çiz
+            }
+        }
+        public class Lokasyon
+        {
+            public int X { get; set; }
+            public int Y { get; set; }
+
+            public Lokasyon(int x, int y)
+            {
+                X = x;
+                Y = y;
+            }
+
+            // Get, Set ve diğer yöntemler eklenebilir
+
+            // Lokasyonların eşitliğini kontrol etmek için Equals metodu eklenebilir
+            public override bool Equals(object? obj)
+            {
+                if (obj == null || GetType() != obj.GetType())
+                {
+                    return false;
+                }
+
+                Lokasyon other = (Lokasyon)obj;
+                return X == other.X && Y == other.Y;
+            }
+        }
+        public class Uygulama
+        {
+
+        }
+
+    }
+}
+////////////////////
+namespace Giris
+{
+    partial class Form2
+    {
+        /// <summary>
+        /// Required designer variable.
+        /// </summary>
+        private System.ComponentModel.IContainer components = null;
+
+        /// <summary>
+        /// Clean up any resources being used.
+        /// </summary>
+        /// <param name="disposing">true if managed resources should be disposed; otherwise, false.</param>
+        protected override void Dispose(bool disposing)
+        {
+            if (disposing && (components != null))
+            {
+                components.Dispose();
+            }
+            base.Dispose(disposing);
+        }
+
+        #region Windows Form Designer generated code
+
+        /// <summary>
+        /// Required method for Designer support - do not modify
+        /// the contents of this method with the code editor.
+        /// </summary>
+        private void InitializeComponent()
+        {
+            button1 = new Button();
+            SuspendLayout();
+            // 
+            // button1
+            // 
+            button1.BackColor = Color.Transparent;
+            button1.Location = new Point(12, 12);
+            button1.Name = "button1";
+            button1.Size = new Size(94, 29);
+            button1.TabIndex = 0;
+            button1.Text = "Başlat";
+            button1.UseVisualStyleBackColor = false;
+            button1.Click += button1_Click;
+            // 
+            // Form2
+            // 
+            AutoScaleDimensions = new SizeF(8F, 20F);
+            AutoScaleMode = AutoScaleMode.Font;
+            ClientSize = new Size(912, 512);
+            Controls.Add(button1);
+            Name = "Form2";
+            Text = "Form2";
+            Load += Form2_Load;
+            ResumeLayout(false);
+        }
+
+        #endregion
+
+        private Button button1;
+    }
+}
