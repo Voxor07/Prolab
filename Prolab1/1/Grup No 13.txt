@@ -1,0 +1,266 @@
+#include <stdio.h>
+#include <graphics.h>
+#include <math.h>
+#include <string.h>
+#include <curl/curl.h>
+#include <stdlib.h>
+
+char data[4096];
+
+size_t WriteCallback(void *contents, size_t size, size_t nmemb, void *userp) {
+    size_t total_size = size * nmemb;
+
+    memcpy(userp, contents, total_size);
+    return total_size;
+}
+void ikiBoyutluTekBoyutlu(int ikiBoyutluDizi[][2], int satir, int deneme[]) {
+    int index = 0;
+    for (int i = 0; i < satir; i++) {
+        for (int j = 0; j < 2; j++) {
+            deneme[index] = ikiBoyutluDizi[i][j];
+            index++;
+        }
+    }
+}
+double calculatemes(int x1, int y1, int x2, int y2) {
+    return sqrt(pow(x2 - x1, 2) + pow(y2 - y1, 2));
+}
+double alanhesap(int x[], int y[], int numVertices) {
+    double area = 0.0;
+    for (int i = 0; i < numVertices - 1; i++) {
+        area += x[i] * y[i + 1] - x[i + 1] * y[i];
+    }
+    area += x[numVertices - 1] * y[0] - x[0] * y[numVertices - 1];
+    area = fabs(area) / 2.0;
+    return area;
+}
+void drawgrid1() {
+    int i;
+    for(i = 0; i <= getmaxx(); i += 10) {
+        setcolor(DARKGRAY);
+        line(i, 0, i, getmaxy());
+    }
+    for(i = 0; i <= getmaxy(); i += 10) {
+        setcolor(DARKGRAY);
+        line(0, i, getmaxx(), i);
+    }
+}
+int ortalama(int dizi[],int deger) {
+	int ort=0;
+	for(int k=0;k<deger;k++){
+		ort+=dizi[k];
+	}
+	ort=ort/deger;
+	return ort;
+}
+void drawgrid2() {
+    int i;
+    for(i = 0; i <= getmaxx(); i += 40) {
+        setcolor(LIGHTGRAY);
+        line(i, 0, i, getmaxy());
+    }
+    for(i = 0; i <= getmaxy(); i += 40) {
+        setcolor(LIGHTGRAY);
+        line(0, i, getmaxx(), i);
+    }
+}
+
+int main()
+{	
+	
+
+	
+	CURL *curl;
+    CURLcode res;
+	char data[4096];
+    curl = curl_easy_init();
+    if (curl) {
+        curl_easy_setopt(curl, CURLOPT_URL, "http://bilgisayar.kocaeli.edu.tr/prolab1/prolab1.txt");
+        curl_easy_setopt(curl, CURLOPT_WRITEFUNCTION, WriteCallback);
+        curl_easy_setopt(curl, CURLOPT_WRITEDATA, data);
+
+        res = curl_easy_perform(curl);
+
+        if (res != CURLE_OK) {
+            fprintf(stderr, "curl_easy_perform() failed: %s\n", curl_easy_strerror(res));
+        }
+        curl_easy_cleanup(curl);
+    }
+	
+	
+	printf("Islem yapilacak satir numarasini girin: ");
+    int choice;
+    scanf("%d", &choice);
+
+    char *startB;
+    char *endF;
+
+    if (choice == 1) {
+        startB = strstr(data, "1B");
+        endF = strstr(data, "F");
+    } else if (choice == 2) {
+        startB = strstr(data, "2B");
+        endF = strstr(startB, "F");
+    } else if (choice == 3) {
+        startB = strstr(data, "3B");
+        endF = strstr(startB, "F");
+    } else if (choice == 4) {
+        startB = strstr(data, "4B");
+        endF = strstr(startB, "F");
+    } else if (choice == 5) {
+        startB = strstr(data, "5B");
+        endF = strstr(startB, "F");
+    } else if (choice == 6) {
+        startB = strstr(data, "6B");
+        endF = strstr(startB, "F");
+    } else if (choice == 7) {
+        startB = strstr(data, "7B");
+        endF = strstr(startB, "F");
+    } else if (choice == 8) {
+        startB = strstr(data, "8B");
+        endF = strstr(startB, "F");
+    } else if (choice == 9) {
+        startB = strstr(data, "9B");
+        endF = strstr(startB, "F");
+    } else if (choice == 10) {
+        startB = strstr(data, "10B");
+        endF = strstr(startB, "F");
+    } else if (choice == 11) {
+        startB = strstr(data, "11B");
+        endF = strstr(startB, "F");
+    } else if (choice == 12) {
+        startB = strstr(data, "12B");
+        endF = strstr(startB, "F");
+    } else if (choice == 13) {
+        startB = strstr(data, "13B");
+        endF = strstr(startB, "F");
+    } else if (choice == 14) {
+        startB = strstr(data, "14B");
+        endF = strstr(startB, "F");
+    } else if (choice == 15) {
+        startB = strstr(data, "15B");
+        endF = strstr(startB, "F");
+    } else if (choice == 16) {
+        startB = strstr(data, "16B");
+        endF = strstr(startB, "F");
+    } else if (choice == 17) {
+        startB = strstr(data, "17B");
+        endF = strstr(startB, "F");
+    } else if (choice == 18) {
+        startB = strstr(data, "18B");
+        endF = strstr(startB, "F");
+    } else if (choice == 19) {
+        startB = strstr(data, "19B");
+        endF = strstr(startB, "F");
+    } else if (choice == 20) {
+        startB = strstr(data, "20B");
+        endF = strstr(startB, "F");
+    }else {
+        printf("Invalid choice. Exiting...\n");
+        return 1;
+    }
+
+    if (startB != NULL && endF != NULL) {
+        char *current = startB + 2;
+		int coordinates[100];
+        
+        int index = 0;
+        while (current < endF) {
+            if (*current == '(') {
+                current++;
+                int x, y;
+                if (sscanf(current, "%d,%d", &x, &y) == 2) {
+                    coordinates[index] = x*10;
+                    coordinates[index+1] = y*10;
+                    index+=2;
+                }
+ 
+                 while (*current != ')' && current < endF) {
+                    current++;
+                }
+            } else {
+                current++;
+            }
+        }
+            
+		int gd = DETECT, gm; 
+		initgraph(&gd, &gm, "");
+		drawgrid1();
+		drawgrid2();
+		int count=0;
+        for (int i = 0; i < index; i+=2) {
+            
+     	       count+=2;
+        }
+        
+        setfillstyle(SOLID_FILL, BLUE);
+        fillpoly(count/2,coordinates);
+    	int num = count/2;
+		int x[num], y[num];
+		for (int i = 0; i < num; i++) {
+        x[i] = coordinates[2 * i];
+        y[i] = coordinates[2 * i + 1];
+    }
+		double alan = alanhesap(x, y, num)/100;
+		char alanm[40];
+	    sprintf(alanm, "Alan: %.2f", alan);
+	    outtextxy(ortalama(x,num),ortalama(y,num),alanm);
+		getch();
+		cleardevice();
+       	drawgrid1();
+		drawgrid2();
+		setfillstyle(SOLID_FILL, GREEN);
+		fillpoly(count/2,coordinates);
+	    
+		int minX = x[0], minY = y[0], maxX = x[0], maxY = y[0];
+
+
+    for (int i = 0; i < num; i++) {
+        if (x[i] < minX) minX = x[i];
+        if (x[i] > maxX) maxX = x[i];
+        if (y[i] < minY) minY = y[i];
+        if (y[i] > maxY) maxY = y[i];
+    }
+        
+	    
+		
+		int brmsndj=0, brmpltfrm=0, rezerv=(int)alanm*10;
+	    printf("Birim sondaj maliyetini girin: ");
+	    scanf("%d",&brmsndj);
+	    printf("Birim platform maliyetini girin: ");
+	    scanf("%d",&brmpltfrm);
+		int kareX = 20;
+    int kareY = 20;
+
+
+    for (int i = minX; i < maxX; i += kareX) {
+        for (int j = minY; j < maxY; j += kareY) {
+            rectangle(i, j, i + kareX, j + kareY);
+        int kareninAlani = 0;
+            for (int k = 0; k < num; k++) {
+                int x1 = x[k];
+                int y1 = y[k];
+                int x2 = x[(k + 1) % num];
+                int y2 = y[(k + 1) % num];
+
+
+                if ((x1 >= i && x1 < i + kareX && y1 >= j && y1 < j + kareY) ||
+                    (x2 >= i && x2 < i + kareX && y2 >= j && y2 < j + kareY)) {
+                    kareninAlani += calculatemes(x1, y1, x2, y2);
+                }
+            }
+            if (kareninAlani > 0 && kareninAlani == kareX * kareY) {
+                setfillstyle(SOLID_FILL, BLUE);
+                floodfill(i + 1, j + 1, GREEN);
+            }
+        }
+    }	
+		getch();
+		closegraph();
+
+	} else {
+        printf("Data not found for your choice. Exiting...\n");
+    }	
+       
+	
+}

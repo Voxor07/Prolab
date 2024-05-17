@@ -1,0 +1,25 @@
+/*CURL *curl;
+    CURLcode res;
+
+    curl = curl_easy_init();
+    if (curl) {
+        curl_easy_setopt(curl, CURLOPT_URL, "http://bilgisayar.kocaeli.edu.tr/prolab1/prolab1.txt");
+        curl_easy_setopt(curl, CURLOPT_WRITEFUNCTION, WriteCallback);
+        curl_easy_setopt(curl, CURLOPT_WRITEDATA, data);
+
+        res = curl_easy_perform(curl);
+
+        if (res != CURLE_OK) {
+            fprintf(stderr, "curl_easy_perform() failed: %s\n", curl_easy_strerror(res));
+        } else {
+            printf("Veri:\n%s\n", data);
+		}
+		
+        curl_easy_cleanup(curl);
+    }
+    char *p = data;*/
+	/*initwindow(500,500,(char*) "");
+	drawgrid1();
+	drawgrid1();
+	*/
+	
